@@ -1,3 +1,4 @@
+import sys
 import streamlit as st
 import numpy as np
 import soundfile as sf
@@ -7,6 +8,23 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import tempfile
 import os
 from audio_recorder_streamlit import audio_recorder
+import subprocess
+import ffmpeg
+
+st.sidebar.text(f"Python version: {sys.version}")
+
+def verify_ffmpeg():
+    try:
+        # Check if ffmpeg is available
+        subprocess.run(['ffmpeg', '-version'], capture_output=True, check=True)
+        return True
+    except (subprocess.SubprocessError, FileNotFoundError):
+        st.error("FFmpeg is not installed. Please install FFmpeg to use this application.")
+        return False
+
+# Verify FFmpeg at startup
+if not verify_ffmpeg():
+    st.stop()
 
 # Load models (cache to avoid reloading on every rerun)
 @st.cache_resource
