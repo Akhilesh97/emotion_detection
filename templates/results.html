@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotion Detection Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 24px 24px 24px;
+        }
+        h2 {
+            text-align: center;
+            color: #1976d2;
+            margin-bottom: 18px;
+        }
+        .overall {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 24px;
+            color: #333;
+            background: #e3f2fd;
+            border-radius: 6px;
+            padding: 12px 0;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+        }
+        th {
+            background: #1976d2;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background: #f1f7fb;
+        }
+        tr:nth-child(odd) {
+            background: #fff;
+        }
+        td {
+            color: #333;
+        }
+        .back-btn {
+            display: inline-block;
+            background: #1976d2;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 22px;
+            border-radius: 4px;
+            font-size: 1em;
+            margin: 0 auto;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .back-btn:hover {
+            background: #125ea7;
+        }
+        .error {
+            color: #d32f2f;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Emotion Detection Results</h2>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% else %}
+            <div class="overall">Overall Emotion: {{ overall }} (Score: {{ overall_score }})</div>
+            <table>
+                <tr>
+                    <th>Segment</th>
+                    <th>Text</th>
+                    <th>Emotion</th>
+                    <th>Confidence</th>
+                </tr>
+                {% for seg in segments %}
+                <tr>
+                    <td>{{ seg.time }}</td>
+                    <td>{{ seg.text }}</td>
+                    <td>{{ seg.emotion }}</td>
+                    <td>{{ seg.confidence }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+        <div style="text-align:center;">
+            <a href="/" class="back-btn">&#8592; Back to Home</a>
+        </div>
+    </div>
+</body>
+</html> 

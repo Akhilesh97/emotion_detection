@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Emotion Detection from Audio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 32px 24px 24px 24px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .section {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eee;
+    }
+    .section:last-child {
+      border-bottom: none;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    input[type="file"] {
+      margin-bottom: 12px;
+    }
+    button, input[type="submit"] {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 8px;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    #audioPlayback {
+      display: block;
+      margin-top: 10px;
+      width: 100%;
+    }
+    #processingMsg {
+      display: none;
+      text-align: center;
+      color: #1976d2;
+      font-weight: bold;
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Emotion Detection from Audio</h2>
+    <form id="audioForm" action="/upload" method="POST" enctype="multipart/form-data">
+      <div class="section">
+        <label for="fileInput">Upload Audio File</label>
+        <input type="file" name="file" accept="audio/*" id="fileInput">
+      </div>
+      <div class="section">
+        <label>Or Record Audio</label>
+        <button type="button" id="recordBtn">Start Recording</button>
+        <button type="button" id="stopBtn" disabled>Stop Recording</button>
+        <audio id="audioPlayback" controls style="display:none;"></audio>
+        <input type="hidden" name="recorded" id="recordedFlag" value="0">
+      </div>
+      <input type="submit" value="Submit">
+    </form>
+    <div id="processingMsg">Processing... Please wait.</div>
+  </div>
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const fileInput = document.getElementById('fileInput');
+    const recordedFlag = document.getElementById('recordedFlag');
+    const processingMsg = document.getElementById('processingMsg');
+    let recordedBlob = null;
+
+    recordBtn.onclick = async () => {
+      audioChunks = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.start();
+      recordBtn.disabled = true;
+      stopBtn.disabled = false;
+      fileInput.disabled = true;
+      recordedFlag.value = "1";
+      mediaRecorder.ondataavailable = e => {
+        audioChunks.push(e.data);
+      };
+      mediaRecorder.onstop = () => {
+        recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        audioPlayback.src = URL.createObjectURL(recordedBlob);
+        audioPlayback.style.display = 'block';
+        fileInput.value = "";
+        fileInput.disabled = false;
+      };
+    };
+
+    stopBtn.onclick = () => {
+      mediaRecorder.stop();
+      recordBtn.disabled = false;
+      stopBtn.disabled = true;
+    };
+
+    // If user selects a file, clear recorded audio
+    fileInput.onchange = () => {
+      recordedBlob = null;
+      audioPlayback.style.display = 'none';
+      recordedFlag.value = "0";
+    };
+
+    document.getElementById('audioForm').onsubmit = async (e) => {
+      if (recordedBlob) {
+        e.preventDefault();
+        processingMsg.style.display = 'block';
+        const formData = new FormData();
+        formData.append('file', recordedBlob, 'recorded.webm');
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+        processingMsg.style.display = 'none';
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          // If not redirected, replace the page with the response
+          const html = await response.text();
+          document.open();
+          document.write(html);
+          document.close();
+        }
+      } else {
+        processingMsg.style.display = 'block';
+        // Let the form submit natively for file upload
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Web framework
+Flask>=2.2
+Werkzeug>=2.2
+# For running in production
+Gunicorn>=20.1
+
+# Core ML/Audio dependencies
+numpy>=1.23
+soundfile>=0.12
+# Whisper and dependencies
+openai-whisper>=20231117
+# Hugging Face Transformers for emotion model
+transformers>=4.30
+# PyTorch and torchaudio (CPU version for Heroku)
+torch>=2.0
+# torchaudio is needed for some audio ops, but not always required by whisper
+# If you get errors, uncomment the next line
+# torchaudio>=2.0
+
+# For file uploads
+# Werkzeug is already a Flask dependency, but listed for clarity
+werkzeug>=2.2 
