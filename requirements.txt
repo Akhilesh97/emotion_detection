@@ -24,3 +24,6 @@ transformers>=4.30
 # For file uploads
 # Werkzeug is already a Flask dependency, but listed for clarity
 werkzeug>=2.2 
+
+streamlit
+audio-recorder-streamlit
