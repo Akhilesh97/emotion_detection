@@ -26,7 +26,7 @@ emotion_model.eval()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 emotion_model.to(device)
 
-label_names = ['anger', 'disgust', 'fear', 'joy', 'neutral', 'sadness', 'surprise', 'love', 'confusion', 'boredom']
+label_names = ['sadness', 'joy', 'love', 'anger', 'fear', 'surprise', 'neutral']
 
 def predict_emotion(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
@@ -130,5 +130,5 @@ def upload():
 
 if __name__ == "__main__":
     import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port)
